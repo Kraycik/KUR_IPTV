@@ -1,0 +1,18 @@
+{
+  "name": "KUR IPTV",
+  "icon": "https://githubusercontent.com",
+  "type": "list",
+  "headline": "KUR IPTV - XOŞ GƏLMİSİNİZ",
+  "items": [
+    {
+      "title": "Azərbaycan Kanalları",
+      "icon": "https://githubusercontent.com",
+      "action": "link:http://MƏNİM-KANAL-LİNKLƏRİM.json"
+    },
+    {
+      "title": "Test Canlı Yayım",
+      "icon": "https://githubusercontent.com",
+      "action": "video:https://unified-streaming.com"
+    }
+  ]
+}
