@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KÜR IPTV - Tizen OS</title>
+    
+    <!-- 🎨 CSS Stil Faylı -->
+    <link rel="stylesheet" type="text/css" href="css/style.css"/>
+
+    <!-- 📺 Simulyator Sığortası -->
+    <script type="text/javascript">
+        if (!window.webapis) {
+            window.webapis = {
+                avplay: { open: function(){}, setDisplayRect: function(){}, setStreamingProperty: function(){}, setListener: function(){}, prepareAsync: function(){}, stop: function(){}, close: function(){} },
+                product: { getDUID: function() { return "KUR_IPTV-ID"; } }
+            };
+            console.log("Simulyator mühiti aktivləşdirildi: webapis bypass olundu.");
+        }
+    </script>
+    <!-- Real TV drayveri -->
+    <script type="text/javascript" src="$WEBAPIS/webapis/webapis.js" onerror="console.log('Webapis faylı keçildi')"></script>
+
+    <!-- 🚀 KÜR IPTV JavaScript Modulları (Nöqtəsiz, birbaxa qovluq yolu ilə) -->
+    <script type="text/javascript" src="js/Channel.js"></script>
+    <script type="text/javascript" src="js/ChannelRepository.js"></script>
+    <script type="text/javascript" src="js/FirebaseEngine.js"></script>
+    <script type="text/javascript" src="js/PlayerEngine.js"></script>
+    <script type="text/javascript" src="js/ChannelAdapter.js"></script>
+    <script type="text/javascript" src="js/LanguageEngine.js"></script>
+    <script type="text/javascript" src="js/ContextDialogEngine.js"></script>
+    <script type="text/javascript" src="js/SearchEngine.js"></script>
+    
+    <!-- 🎮 Ana Yükləyici (Ən sonda işə düşür) -->
+    <script type="text/javascript" src="js/main.js"></script>
+</head>
+<body>
+
+    <!-- 🏆 KÜR IPTV ŞƏXSİ BREND LOQOSU (Hər şeyin üstündə durması üçün bədənin ilkin elementi olaraq əlavə edildi) -->
+    <img id="my-logo" src="img/my-logo.png" onerror="this.style.display='none';" alt="Brand Logo" />
+
+    <!-- ⏳ 1. SPLASH SCREEN -->
+    <div id="splash-screen">
+        <img src="img/kur_iptv_splash.png" class="splash-logo" onerror="this.style.display='none'"/>
+        <h1 class="splash-title">KUR IPTV</h1>
+        <p class="splash-subtitle">Yüklənir...</p>
+    </div>
+
+    <!-- 🔑 2. LOGIN SCREEN - ID PƏNCƏRƏSİ -->
+    <div id="login-screen" style="display: none;">
+        <div class="login-card">
+            <div id="login-title">KÜR IPTV Login</div>
+            <div id="login-id-display" tabindex="0">İstifadəçi ID</div>
+            <button id="login-btn" tabindex="0">Daxil ol</button>
+            <p class="login-info">Pultun rəqəm düymələrindən (0-9) istifadə edin.<br>Silmək üçün "SOL", Keçid üçün "AŞAĞI", Təsdiq üçün "OK" bas.</p>
+        </div>
+    </div>
+
+    <!-- 📺 3. HARDWARE VIDEO PLAYER -->
+    <div id="player-wrapper"></div>
+
+    <!-- 📱 4. ANA MENYU (Navigation Drawer) -->
+    <div id="navigation-drawer" style="display: none;">
+        <div class="drawer-header">
+            <img src="WebContent/kur_iptv_splash.png" class="drawer-logo" onerror="this.style.display='none'"/>
+            <h2>KUR IPTV</h2>
+        </div>
+        <div class="drawer-menu">
+            <div class="menu-item active" id="menu_nav_channels" tabindex="0">📺 Kanallar</div>
+            <div class="menu-item" id="menu_nav_tutorial" tabindex="0">📖 Video Təlimat</div>
+            <div class="menu-item" id="menu_nav_settings" tabindex="0">⚙ Ayarlar</div>
+            <div class="menu-item" id="menu_nav_about" tabindex="0">ℹ Haqqımızda</div>
+        </div>
+    </div>
+
+    <!-- 🗂️ 5. KANAL SİYAHISI -->
+    <div id="main-ui" style="display: none;">
+        <div id="tvEmptyMessage" style="display: none; text-align: center; padding: 40px; font-size: 26px; color: #aaa;">Kanal tapılmadı</div>
+        <div id="recyclerViewChannels"></div>
+    </div>
+
+    <!-- ℹ️ 6. HAQQIMIZDA PANELİ -->
+    <div id="about-ui" style="display: none;">
+        <div class="card-content">
+            <h1 id="aboutTitle">Haqqımızda</h1>
+            <p id="aboutVersion" class="version-label">Versiya: 1.0.0</p>
+            <div class="divider"></div>
+            <p id="aboutMainText" class="main-desc">Yüklənir...</p>
+            <p id="aboutMessage" class="sub-desc"></p>
+            <div class="divider"></div>
+            <p id="aboutExtra" class="rights-label"></p>
+        </div>
+    </div>
+
+    <!-- 🔒 7. TV KONTEKST VE PIN DIALOGLARI -->
+    <div id="context-dialog-ui" style="display: none;">
+        <div class="context-card">
+            <h2 id="context-dialog-title">Seçimlər</h2>
+            <div id="context-options-list"></div>
+        </div>
+    </div>
+
+    <div id="pin-dialog-ui" style="display: none;">
+        <div class="pin-card">
+            <h2>🔒 Şəxsi Kanal</h2>
+            <p id="pin-dialog-hint">PIN kodu daxil edin</p>
+            <div id="pin-stars">_ _ _ _</div>
+            <p class="pin-info">Pultun rəqəm düymələrindən istifadə edin</p>
+        </div>
+    </div>
+
+    <!-- 🔍 8. AXTARIŞ DIALOG PANELİ -->
+    <div id="search-dialog-ui" style="display: none;">
+        <div class="search-card">
+            <h2>🔍 Kanal Axtar</h2>
+            <p>Axtarmaq istədiyiniz kanalın adını yazın</p>
+            <input type="text" id="search-input-field" placeholder="Kanal adını yazın..." autocomplete="off"/>
+            <div class="search-dialog-buttons">
+                <button id="search-btn-confirm" tabindex="0">Axtar</button>
+                <button id="search-btn-cancel" tabindex="0">Ləğv et</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🎚️ 9. CANLI YAYIM INFO PANELİ -->
+    <div id="infoPanel" style="display: none;">
+        <div class="info-content">
+            <span id="infoChannelNumber">00</span>
+            <img id="infoChannelLogo" src="img/yenilogom.png" alt="Logo" onerror="this.style.display='none'"/>
+            <div class="info-text">
+                <h1 id="infoChannelName">Kanal Yüklənir...</h1>
+                <p id="infoCurrentEpg">Canlı Yayım</p>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
